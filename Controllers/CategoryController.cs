@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Shop.Models;
+
 
 //https://localhost:5001/categories
 [Route("categories")]
@@ -7,40 +10,52 @@ public class CategoryController : ControllerBase
 {
     [HttpGet]
     [Route("")]
-    public string Get()
+    public async Task<ActionResult<List<Category>>> Get()
     {
-        return "GET";
+        return new List<Category>();
     }
 
     [HttpGet]
     [Route("{id:int}")]
-    public string GetById(int id)
+    public async Task<ActionResult<Category>> GetById(int id)
     {
-        return $"GET item #{id}";
+        return new Category();
     }
 
     [HttpPost]
     [Route("")]
-    public Category Post([FromBody]Category model)
+    public async Task<ActionResult<List<Category>>> Post([FromBody]Category model)
     {
-        return model;
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        return Ok(model);
     }
 
     [HttpPut]
     [Route("{id:int}")]
-    public Category Put(int id, [FromBody]Category model)
+    public async Task<ActionResult<List<Category>>> Put(int id, [FromBody]Category model)
     {
-        if (model.Id == id)
+        //Verifica se o ID é válido
+        if (model.Id != id)
         {
-            return model;
+            return NotFound(new { message = "Categoria não localizada"});
+        }
+
+        //Verifica se os dados são validos
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState); 
         } 
-        return null;
+        
+        return Ok();
     }
 
     [HttpDelete]
     [Route("")]
-    public string Delete()
+    public async Task<ActionResult<List<Category>>> Delete()
     {
-        return "DELETE";
+        return Ok();
     }
 } 
