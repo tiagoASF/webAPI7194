@@ -87,9 +87,30 @@ public class CategoryController : ControllerBase
     }
 
     [HttpDelete]
-    [Route("")]
-    public async Task<ActionResult<List<Category>>> Delete()
+    [Route("{id:int}")]
+    public async Task<ActionResult<List<Category>>> Delete(
+        int id,
+        [FromServices]DataContext context
+    )
+    //Para efetuar o DELETE, primeiro é necessário recuperar a categoria do banco
     {
-        return Ok();
+        var category = await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+        if (category == null)
+        {
+            return NotFound(new { message = "Categoria não localizada"});
+        }
+
+        try
+        {
+            context.Categories.Remove(category);
+            await context.SaveChangesAsync();
+            return Ok(new { message = "Categoria removida com sucesso"});
+            // ou
+            //return Ok(category);
+        }
+        catch (Exception)
+        {
+            return BadRequest(new { message = "Não é possível remover a categoria"});
+        }
     }
 } 
