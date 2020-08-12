@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System;
 using Shop.Models;
+using Shop.Data;
 
 
 //https://localhost:5001/categories
@@ -24,13 +26,27 @@ public class CategoryController : ControllerBase
 
     [HttpPost]
     [Route("")]
-    public async Task<ActionResult<List<Category>>> Post([FromBody]Category model)
+    public async Task<ActionResult<List<Category>>> Post(
+        [FromBody]Category model,
+        [FromServices]DataContext context
+    )
     {
-        if (!ModelState.IsValid)
+        try
         {
-            return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            
+            context.Categories.Add(model);
+            await context.SaveChangesAsync();
+            return Ok(model);
         }
-        return Ok(model);
+        catch (Exception)
+        {
+            return BadRequest(new {message = "Não foi possível criar a categoria"});
+        }
+        
     }
 
     [HttpPut]
