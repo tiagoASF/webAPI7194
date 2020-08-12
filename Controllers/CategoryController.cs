@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
@@ -51,7 +52,11 @@ public class CategoryController : ControllerBase
 
     [HttpPut]
     [Route("{id:int}")]
-    public async Task<ActionResult<List<Category>>> Put(int id, [FromBody]Category model)
+    public async Task<ActionResult<List<Category>>> Put(
+        int id,
+        [FromBody]Category model,
+        [FromServices]DataContext context
+    )
     {
         //Verifica se o ID é válido
         if (model.Id != id)
@@ -65,7 +70,20 @@ public class CategoryController : ControllerBase
             return BadRequest(ModelState); 
         } 
         
-        return Ok();
+        try
+        {
+            context.Entry<Category>(model).State = EntityState.Modified;
+            await context.SaveChangesAsync();
+            return Ok(model);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return BadRequest(new { message = "Esse registro já foi atualizado"});
+        }
+        catch (Exception)
+        {
+            return BadRequest(new { message = "Não foi possível atualizar a categoria"});
+        }
     }
 
     [HttpDelete]
