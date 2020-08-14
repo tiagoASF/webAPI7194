@@ -6,6 +6,7 @@ using System;
 using Shop.Models;
 using Shop.Data;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Shop.Controllers
 {
@@ -63,6 +64,7 @@ namespace Shop.Controllers
 
         [HttpPost]
         [Route("")]
+        [Authorize(Roles = "employee")]
         public async Task<ActionResult<List<Product>>> Post(
             [FromBody]Product model,
             [FromServices]DataContext context
@@ -88,6 +90,7 @@ namespace Shop.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
+        [Authorize(Roles = "manager")]
         public async Task<ActionResult<List<Product>>> Put(
             int id,
             [FromBody]Product model,
@@ -125,6 +128,7 @@ namespace Shop.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
+        [Authorize(Roles = "manager")]
         public async Task<ActionResult<List<Product>>> Delete(
             int id,
             [FromServices]DataContext context
