@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 
 //https://localhost:5001/categories
-[Route("categories")]
+[Route("v1/categories")]
 public class CategoryController : ControllerBase
 {
     [HttpGet]

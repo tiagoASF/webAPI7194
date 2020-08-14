@@ -8,6 +8,8 @@ using Shop.Data;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.Linq;
 
 namespace Shop
 {
@@ -23,6 +25,16 @@ namespace Shop
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add<GzipCompressionProvider>();
+                //informa que quer comprimir tudo que for json no aplication. Serve para outros formatos também
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/json"});
+            });
+            
+            //services.AddResponseCaching();
+            //opção para cachear a aplicação inteira, não é recomendado por default
+            
             services.AddControllers();
 
             //Transforma a chave criada em shop.Settings para o formato de bytes
@@ -31,7 +43,8 @@ namespace Shop
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
+            })
+            .AddJwtBearer(x =>
             {
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
@@ -61,9 +74,8 @@ namespace Shop
 
             app.UseRouting();
 
-            app.UseAuthorization();
-
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

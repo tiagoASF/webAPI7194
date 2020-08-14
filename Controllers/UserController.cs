@@ -31,10 +31,11 @@ namespace Shop.Controllers
         
         [HttpPost]
         [Route("")]
-        public async Task<ActionResult<List<User>>> Post(
-            [FromBody]User model,
-            [FromServices]DataContext context
-        )
+        [AllowAnonymous]
+        //[Authorize(Roles = "manager")]
+        public async Task<ActionResult<User>> Post(
+            [FromServices]DataContext context,
+            [FromBody]User model)
         {
             try
             {
@@ -55,6 +56,7 @@ namespace Shop.Controllers
 
         [HttpPost]
         [Route("login")]
+        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Authenticate(
             [FromServices] DataContext context,
             [FromBody] User model)
