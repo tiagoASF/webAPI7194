@@ -7,7 +7,7 @@ using Shop.Models;
 
 namespace Shop.Services
 {
-    public static class tokenService
+    public static class TokenService
     {
         public static string GenerateToken(User user)
         {
