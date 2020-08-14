@@ -14,6 +14,21 @@ namespace Shop.Controllers
     [Route("/users")]
     public class UserController : Controller
     {
+        
+        [HttpGet]
+        [Route("")]
+        [Authorize(Roles = "manager")]
+        public async Task<ActionResult<List<User>>> Get([FromServices] DataContext context)
+        {
+            var users = await context
+                .Users
+                .AsNoTracking()
+                .ToListAsync();
+
+            return users;    
+        }
+
+        
         [HttpPost]
         [Route("")]
         public async Task<ActionResult<List<User>>> Post(
@@ -62,6 +77,50 @@ namespace Shop.Controllers
             };    
 
         }
+
+        [HttpPut]
+        [Route("{id:int}")]
+        [Authorize(Roles = "manager")]
+        public async Task<ActionResult<User>> Put(
+            int id,
+            [FromBody]User model,
+            [FromServices]DataContext context
+        )
+        {
+            //Verifica se o ID é válido
+            if (model.Id != id)
+            {
+                return NotFound(new { message = "Usuário não localizado"});
+            }
+
+            //Verifica se os dados são validos
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); 
+            } 
+            
+            try
+            {
+                context.Entry<User>(model).State = EntityState.Modified;
+                await context.SaveChangesAsync();
+                return Ok(model);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest(new { message = "Esse registro já foi atualizado"});
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Não foi possível atualizar a categoria"});
+            }
+        }
+
+        //Implementar o DELETE
+
+        
+
+
+       
 
 
 
