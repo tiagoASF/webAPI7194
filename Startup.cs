@@ -59,9 +59,10 @@ namespace Shop
                     };
             });
 
-            //services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
-            services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
-            services.AddScoped<DataContext, DataContext>();
+            services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Database"));
+            //services.AddDbContext<DataContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("connectionString")));
+            //services.AddScoped<DataContext, DataContext>();
+            //Nas versões atuais no AddScoped não é mais necessário, o AddDBContext já faz a função
             services.AddSwaggerGen( c => 
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Shop API", Version = "v1"}));
         }

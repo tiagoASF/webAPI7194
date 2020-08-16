@@ -44,9 +44,15 @@ namespace Shop.Controllers
                     return BadRequest(ModelState);
                 }
                 
+                //novo usuário é criado automaticamente com o role employee, melhora a seguranca
+                model.Role = "employee";
                 context.Users.Add(model);
                 await context.SaveChangesAsync();
+                //Escode a senha a ser passada
+                model.Password = "";
                 return Ok(model);
+
+
             }
             catch (Exception)
             {
@@ -72,6 +78,8 @@ namespace Shop.Controllers
             }
 
             var token = TokenService.GenerateToken(user);
+            //Esconde a senha
+            user.Password = "";
             return new
             {
                 user = user,
